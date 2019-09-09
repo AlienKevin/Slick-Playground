@@ -3,12 +3,13 @@ import Editor from "./components/editor";
 import Console from "./components/console";
 import Header from "./components/header";
 
-class App extends React.Component<{}, {output: string}> {
-  private output: string = "";
+class App extends React.Component<{}, {
+    output: string,
+  }> {
   constructor(props: any) {
     super(props);
     this.state = {
-      output: ""
+      output: "",
     }
   }
   getOutput = (output: string) => {
@@ -21,8 +22,8 @@ class App extends React.Component<{}, {output: string}> {
           marginTop: "0",
         }}>
         <Header />
-        <Editor getOutput={this.getOutput} />
-        <Console output={this.state.output} />
+        <Editor getOutput={this.getOutput}/>
+        <Console output={this.state.output}/>
       </div>
     );
   }

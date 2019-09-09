@@ -3,20 +3,31 @@ import AceEditor from "react-ace";
 import "brace/theme/solarized_light";
 import { Runner } from "slick-lang";
 
-const runner: Runner = new Runner(true);
-
-class Editor extends React.Component<{getOutput: (output: string) => void}, {}>{
+class Editor extends React.Component<{
+    getOutput: (output: string) => void,
+  }, {}>{
   private value: string = ""
+  private outputTimers: number[] = [];
+  private outputs = "";
+  private output = (output: string) => this.outputs += output + "\n";
+  private runner: Runner = new Runner(true, undefined, this.output);
   onChange = (source: string) => {
     this.value = source;
     setTimeout(() => {
-    let outputs = "";
-    const oldConsoleLog = console["log"];
-    console["log"] = (output: string) => (outputs += output + "\n");
-    runner.run(source, true);
-    console["log"] = oldConsoleLog;
-    outputs = outputs.trimRight(); // remove extra trailing newlines
-    this.props.getOutput(outputs);
+      this.outputs = "";
+      this.runner.run(source, true);
+      this.outputs = this.outputs.trimRight(); // remove extra trailing newlines
+      this.outputTimers.forEach(timer => {
+        clearTimeout(timer);
+      });
+      this.outputTimers = [];
+      if (this.outputs.startsWith("SyntaxError")) {
+        this.outputTimers.push(setTimeout(() => {
+          this.props.getOutput(this.outputs);
+        }, 500) as any);
+      } else {
+        this.props.getOutput(this.outputs);
+      }
     }, 500);
   }
   render = () => {
@@ -28,6 +39,7 @@ class Editor extends React.Component<{getOutput: (output: string) => void}, {}>{
         fontSize={16}
         width="80%"
         height="65vh"
+        showPrintMargin={false}
         style={{
           marginBottom: "1em",
           marginTop: "1em",

@@ -16,6 +16,12 @@ class Console extends React.Component<{output: string}, {}> {
         height="23vh"
         editorProps={{ $blockScrolling: true }}
         readOnly={true}
+        showGutter={false}
+        showPrintMargin={false}
+        highlightActiveLine={false}
+        onLoad={(editor) => {
+          editor.renderer.$cursorLayer.element.style.display = "none";
+        }}
         value={this.props.output}
       />);
   }

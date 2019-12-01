@@ -1,6 +1,7 @@
 import React from "react";
 import AceEditor from "react-ace";
 import "brace/theme/solarized_light";
+import "brace/mode/slick";
 import { Runner, RUN } from "slick-lang";
 
 class Editor extends React.Component<{
@@ -36,6 +37,7 @@ class Editor extends React.Component<{
   render = () => {
     return (<AceEditor
         theme="solarized_light"
+        mode="slick"
         onChange={this.onChange}
         value={this.value}
         name="editor"

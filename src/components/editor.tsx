@@ -1,7 +1,7 @@
 import React from "react";
 import AceEditor from "react-ace";
 import "brace/theme/solarized_light";
-import { Runner } from "slick-lang";
+import { Runner, RUN } from "slick-lang";
 
 class Editor extends React.Component<{
     getOutput: (output: string) => void,
@@ -10,12 +10,14 @@ class Editor extends React.Component<{
   private outputTimers: number[] = [];
   private outputs = "";
   private output = (output: string) => this.outputs += output + "\n";
-  private runner: Runner = new Runner(true, undefined, this.output);
+  private runner: Runner = new Runner({output: this.output});
   onChange = (source: string) => {
-    this.value = source;
+    this.value = replaceSymbolShorthands(source);
     setTimeout(() => {
       this.outputs = "";
-      this.runner.run(source, true);
+      try {
+        this.runner.run(source, { mode : RUN });
+      } catch (ignore) {}
       this.outputs = this.outputs.trimRight(); // remove extra trailing newlines
       this.outputTimers.forEach(timer => {
         clearTimeout(timer);
@@ -30,6 +32,7 @@ class Editor extends React.Component<{
       }
     }, 500);
   }
+
   render = () => {
     return (<AceEditor
         theme="solarized_light"
@@ -49,6 +52,17 @@ class Editor extends React.Component<{
         editorProps={{ $blockScrolling: true }}
       />);
   }
+}
+
+function replaceSymbolShorthands(source: string) {
+  return source
+    .replace(/\\f/g, 'ƒ')
+    .replace(/\/\\/g, '⋏')
+    .replace(/\\\//g, '⋎')
+    .replace(/\-\>/g, '→')
+    .replace(/>=/g, '≥')
+    .replace(/<=/g, '≤')
+    .replace(/!=/g, '≠')
 }
 
 export default Editor;
